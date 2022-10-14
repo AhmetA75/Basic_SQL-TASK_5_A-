@@ -1,0 +1,57 @@
+import psycopg2
+from faker import Faker
+from sqlalchemy import VARCHAR
+fake = Faker()
+from psycopg2.errors import UniqueViolation
+from psycopg2.errorcodes import UNIQUE_VIOLATION
+from psycopg2 import errors
+import time
+start_time=time.time()
+conn = psycopg2.connect(database="postgres", user="postgres", password="postgres", host="localhost", port="5434")
+print ("Opened database successfully")
+cur = conn.cursor()
+Faker.seed(22)
+for i in range (1000):
+    try:
+
+        name = fake.name()
+        email= fake.email()
+        password =fake.password(length=40)        
+        cur.execute("INSERT INTO login (name,email,password) VALUES (%s, %s, %s)", ( name, email, password))
+        conn.commit()
+    except Exception as err:
+        print(err)
+        conn.close()
+        conn = psycopg2.connect(database="postgres", user="postgres", password="postgres", host="localhost", port="5434")
+        cur = conn.cursor()
+        name = fake.name()
+        email= fake.iana_id()+fake.iana_id()+fake.email()
+        password =fake.password(length=40)
+        cur.execute("INSERT INTO login (name,email,password) VALUES (%s, %s, %s)", ( name, email, password))
+        conn.commit()
+
+
+
+
+#conn.commit()
+print ("Records created successfully")
+conn.close()
+
+end_time=time.time()
+print(end_time-start_time)
+
+"""
+Explantations !!!!!
+
+First of all i imported useful librariws and tools for our sample and made connction to SQL database via pyscopeg2
+after that i started a for loop to creating dataset and filling the columns in the table and i saw duplication error because of primary_key e mail faker
+i tried to create too many datas for this reason faker tool creates same e mail and email is primary key leads to duplication error i found three solving way for it
+first: without try structure i can append some numbers to e mail and make unique e mails i tired it and it works working time is 0.42 seconds
+but it adds these numbers to e mails every time
+second: i made a try structure and apllied it this structure leads to change only duplicated e mails the slowest way (5,2 seconds) but convinient way for me
+third changing primary_key to password : in faker dataset we can create passwords up to 40 digits in this we can find duplicates very much hardly even thousands of data 
+(working time 0.42 seconds)
+In conclusion i tried all of this ways and i selected slowest but meaningfully way (try structure)
+
+
+"""
