@@ -1,0 +1,25 @@
+import sqlalchemy as db
+from faker import Faker
+from sqlalchemy import create_engine
+from sqlalchemy import Column,Integer,String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker 
+# Defining the Engine
+engine = db.create_engine("postgresql://postgres:postgres@localhost:5434/postgres")
+  
+# Create the Metadata Object
+metadata_obj = db.MetaData()
+  
+# Define the profile table
+  
+# database name
+Login = db.Table(
+    'login',                                        
+    metadata_obj,                                    
+    db.Column('email', db.VARCHAR, primary_key=True),  # i selected "email" as a primariy_key because it has to bne generat unique it leads to more meaningful dataset
+    db.Column('name', db.VARCHAR),                    
+    db.Column('password', db.VARCHAR),                # password primary_key much more easy and faster for other steps but not meaningful for me
+)
+  
+# Create the profile table
+metadata_obj.create_all(engine)
